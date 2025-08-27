@@ -17,6 +17,7 @@ bool load_xyzw(const std::string& path, std::vector<Vertex>& out, ParseStats* st
         std::istringstream iss(line);
         double x,y,z,w;
         if (!(iss >> x >> y >> z >> w)) { skipped++; continue; }
+        if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z) || !std::isfinite(w)) { skipped++; continue; }
         out.push_back(Vertex{x,y,z,w});
         n++;
     }
