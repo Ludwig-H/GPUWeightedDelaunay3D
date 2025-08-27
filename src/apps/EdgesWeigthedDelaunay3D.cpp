@@ -16,6 +16,10 @@ int main(int argc, char** argv) {
     std::vector<Vertex> P;
     ParseStats st;
     if (!load_xyzw(in, P, &st)) { std::cerr << "Failed to read " << in << "\n"; return 2; }
+    if (P.size() < 4) {
+        std::cerr << "Need at least 4 valid points, got " << P.size() << "\n";
+        return 4;
+    }
     RegularTriangulation rt = regular_triangulation_cpu_bowyer(P, 0);
     if (rt.tets.empty()) rt = regular_triangulation_cpu_bruteforce(P, 0);
     EdgeList E = edges_from_triangulation(rt);
