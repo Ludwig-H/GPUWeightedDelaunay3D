@@ -81,12 +81,16 @@ RegularTriangulation regular_triangulation_cpu_bowyer(const std::vector<Vertex>&
         for (int tid=0; tid<(int)tets.size(); ++tid) if (in_cavity[tid]){
             Tet& T=tets[tid];
             for (int f=0; f<4; ++f){
-                int nb=T.nbr[f]; bool is_boundary=(nb<0) || (nb>=0 && !in_cavity[nb]);
+                int nb=T.nbr[f]; bool is_boundary = (nb < 0) || (nb >= (int)tets.size()) || !in_cavity[nb];
                 if (is_boundary){ int a=T.v[(f+1)&3], b=T.v[(f+2)&3], c=T.v[(f+3)&3]; boundary.push_back({a,b,c,tid,f}); }
             }
         }
 
         for (int tid=0; tid<(int)tets.size(); ++tid) if (in_cavity[tid]) remove_tet(tid);
+        // Purge: invalider tous les voisins pour éviter d’utiliser des pointeurs périmés
+        for (int tid=0; tid<(int)tets.size(); ++tid) if (tets[tid].v[0] >= 0) {
+            tets[tid].nbr[0] = tets[tid].nbr[1] = tets[tid].nbr[2] = tets[tid].nbr[3] = -1;
+        }
 
         fmap.clear();
         for (int tid=0; tid<(int)tets.size(); ++tid) if (tets[tid].v[0]>=0){ add_face(tid,0); add_face(tid,1); add_face(tid,2); add_face(tid,3); }
